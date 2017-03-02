@@ -1,0 +1,62 @@
+
+<html>
+<head>
+  <title>Client</title>
+  <link rel="stylesheet" type="text/css" href="/static/gallery/styles.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-itunes-app" content="app-id=915249334, affiliate-data=1l3v5Ft, app-argument=workflow://workflows/4e36020cc81a4e408215c077efa54eef">
+  <meta property="og:title" content="Client" />
+  <meta property="og:site_name" content="Workflow" />
+  <meta property="og:url" content="/workflows/4e36020cc81a4e408215c077efa54eef" />
+  
+  
+  <meta property="og:image" content="https://d1gzq6u422bfcj.cloudfront.net/workflow_icons/4e36020cc81a4e408215c077efa54eef.png" />
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Client">
+  
+  
+  <meta name="twitter:image" content="https://d1gzq6u422bfcj.cloudfront.net/workflow_icons/4e36020cc81a4e408215c077efa54eef.png">
+  
+</head>
+<body>
+  <div class="install">
+    <div class="install-content">
+      
+      <img src="https://d1gzq6u422bfcj.cloudfront.net/workflow_icons/4e36020cc81a4e408215c077efa54eef.png">
+      
+      <h1>Client</h1>
+      <h2></h2>
+      <p>
+        
+        <a class="btn-install" href="/download">Get Workflow</a>
+        
+      </p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="preview">Preview</div>
+    
+    <div class="action">
+      
+      <img class="icon" src="/static/gallery/icons/URL.png"/>
+      
+      <p>URL</p>
+    </div>
+    
+    <div class="action">
+      
+      <img class="icon" src="/static/gallery/icons/Downloads.png"/>
+      
+      <p>Get Contents of URL</p>
+    </div>
+    
+  </div>
+  <div class="footer">
+    <a href="http://workflow.is"><img src="/static/gallery/workflow-logo.png"></a>
+    <p>
+      <a href="http://workflow.is/">WORKFLOW</a>
+    </p>
+  </div>
+</body>
+</html>
