@@ -1,8 +1,25 @@
 from flask import Flask, request
 import asyncio
+import unittest
 from urllib.parse import quote
 import webbrowser
 import logging
+import json
+from json import loads as decode
+from sys import exc_info
+
+class WorkflowOutputTest(unittest.TestCase):
+    def setUp(self):
+        workflow = Workflow('Client')
+        self.output = workflow.run()
+        self.test_output_is_decodable()
+    
+    def test_output_is_decodable(self):
+        try:
+            jsondata = decode(self.output)
+        except Exception as e:
+            self.failureException = type(e)
+            self.fail(e)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -51,7 +68,14 @@ class Workflow (object):
     def run(self):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.main())
-        return self.data
+        #return self.data
+        return self.encode(self.data)
+    
+    @staticmethod
+    def encode(data):
+        encoder = json.JSONEncoder()
+        encoded = encoder.encode(data)
+        return encoded
     
     @logged
     async def main(self):
@@ -67,7 +91,10 @@ class Workflow (object):
     def send_request(self):
         webbrowser.open(self.url)
 
+
+
+
 if __name__ == "__main__":
     workflow = Workflow("Client")
     data = workflow.run()
-    log.info(data)
+    log.info(data)    
