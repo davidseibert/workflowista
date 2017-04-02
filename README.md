@@ -24,4 +24,6 @@ In Workflow, make a workflow called 'Client' that creates a URL for 'http://loca
 
 Download the zip from [GitHub](https://github.com/davidseibert/workflowista), use the 'Run Python Script' extension for Pythonista, and select 'Import File'. 
 
-### After you download it to Pythonista, select the 'Client.wflow' file in the Library and share to Workflow to import it.
+### Workflow
+
+After you download it to Pythonista, select the 'Client.wflow' file in the Library and share to Workflow to import it.
