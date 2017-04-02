@@ -1,34 +1,20 @@
-from flask import Flask, request
 import asyncio
-import unittest
-from unittest import TestCase, skipUnless, skipIf, skip
 from urllib.parse import quote
-import webbrowser
 import json
+import pytest
+
+from flask import Flask, request
+import webbrowser
+
+VERBOSE_PRINTING = True
 
 class LoggerMixin (object):
-    
     def log(self, message):
-        print('{!r}: {}'.format(self, message))
+        if VERBOSE_PRINTING:
+            print('{!r}: {}'.format(self, message))
 
     def __repr__(self):
         return "{}".format(self.__class__.__name__)
-
-class WorkflowOutputTest(unittest.TestCase):
-    def setUp(self):
-        self.workflow = Workflow()
-        self.output = self.workflow.run('Client')
-
-    def test_output_is_encodable(self):
-        try:
-            encoded_json = json.dumps(self.output)
-        except Exception as e:
-            self.failureException = type(e)
-            self.fail(e)
-
-    def test_output_contents(self):
-        expected = [{'greeting': 'Hello'}]
-        self.assertListEqual(self.output, expected)
 
 class Receiver(LoggerMixin):    
     output = []
@@ -45,7 +31,7 @@ class Receiver(LoggerMixin):
             shutdown()
             return "<h1>Thanks!</h1><p>Shutting down now...</p>"
     
-    async def listen(self):
+    async def start_flask(self):
         self.log('sleeping')
         await asyncio.sleep(0.1)
         self.log('done sleeping')
@@ -83,12 +69,12 @@ class PythonistaServer (LoggerMixin):
         self.log('preparing to run Workflow {!r}'.format(name))
         self.log('starting event loop')
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.connection(name))
+        loop.run_until_complete(self.send_and_receive(name))
         self.log('event loop closed')
         return self.rx.output
 
-    async def connection(self, name):
-        future_response = self.schedule(self.rx.listen)
+    async def send_and_receive(self, name):
+        future_response = self.schedule(self.rx.start_flask)
         self.log('receiver is listening; send request')
         await self.tx.send_request(name)
         self.log('sent request; waiting for response')
@@ -97,6 +83,12 @@ class PythonistaServer (LoggerMixin):
     def schedule(self, func):
         task = asyncio.ensure_future(func())
         return task
+
+def test():
+    server = PythonistaServer()
+    output = server.run('Client')
+    expected = [{'greeting': 'Hello'}]
+    assert output == expected
 
 if __name__ == '__main__':
     server = PythonistaServer()
