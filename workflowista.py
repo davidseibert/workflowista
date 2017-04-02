@@ -4,19 +4,15 @@ import unittest
 from unittest import TestCase, skipUnless, skipIf, skip
 from urllib.parse import quote
 import webbrowser
-import logging
 import json
 
-werkzeug_log = logging.getLogger('werkzeug')
-werkzeug_log.setLevel(logging.DEBUG)
-
 class LoggerMixin (object):
-    def __init__(self):
-        self.log = logging.getLogger(self.__class__.__name__)
-        self.log.setLevel(logging.DEBUG)
-        
+    
+    def log(self, message):
+        print('{!r}: {}'.format(self, message))
+
     def __repr__(self):
-        return "{}()".format(self.__class__.__name__)
+        return "{}".format(self.__class__.__name__)
 
 class WorkflowOutputTest(unittest.TestCase):
     def setUp(self):
@@ -39,21 +35,23 @@ class Receiver(LoggerMixin):
     def __init__(self):
         super().__init__()
         self.flask = Flask(__name__)
+        
         @self.flask.route('/', methods = ['POST'])
         def index():
-            
-            self.log.info(' -- received POST request')
-            self.output.append(request.get_json())
+            data = request.get_json()
+            self.log('received POST request with JSON: {!r}'.format(data))
+            self.output.append(data)
             shutdown = request.environ.get('werkzeug.server.shutdown')
             shutdown()
             return "<h1>Thanks!</h1><p>Shutting down now...</p>"
     
     async def listen(self):
-        self.log.info('sleeping')
+        self.log('sleeping')
         await asyncio.sleep(0.1)
-        self.log.info('started listening')
+        self.log('done sleeping')
+        self.log('flask started; ready to receive response')
         self.flask.run()
-        self.log.info('stopped listening')
+        self.log('flask ended')
 
 class Transmitter(LoggerMixin):
     def make_url(self, name):
@@ -67,32 +65,33 @@ class Transmitter(LoggerMixin):
         return SCHEME.format(quote(name))
 
     async def send_request(self, name):
-        self.log.info('sleeping')
+        self.log('sleeping')
         await asyncio.sleep(0.1)
-        self.log.info('sending')
-        webbrowser.open(self.make_url(name))
-        self.log.info('sent')
+        self.log('opening Workflow {!r}'.format(name))
+        url = self.make_url(name)
+        webbrowser.open(url)
+        
+        self.log('opened {!r}'.format(url))
 
-class Workflow (LoggerMixin):
+class PythonistaServer (LoggerMixin):
     def __init__(self):
         super().__init__()
         self.rx = Receiver()
         self.tx = Transmitter()
 
     def run(self, name):
-        self.log.info('running {}'.format(repr(name)))
-        self.log.info('loop starting')
+        self.log('preparing to run Workflow {!r}'.format(name))
+        self.log('starting event loop')
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.connection(name))
-        self.log.info('loop finished')
-        self.log.info('received output: {}'.format(type(self.rx.output)))
+        self.log('event loop closed')
         return self.rx.output
 
     async def connection(self, name):
         future_response = self.schedule(self.rx.listen)
-        self.log.info('waiting for request')
+        self.log('receiver is listening; send request')
         await self.tx.send_request(name)
-        self.log.info('waiting for response')
+        self.log('sent request; waiting for response')
         await future_response
     
     def schedule(self, func):
@@ -100,6 +99,5 @@ class Workflow (LoggerMixin):
         return task
 
 if __name__ == '__main__':
-    workflow = Workflow()
-    output = workflow.run('Client')
-
+    server = PythonistaServer()
+    output = server.run('Client')
